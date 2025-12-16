@@ -340,7 +340,37 @@ The integration automatically maps Monday column types to Snowflake data types:
 | email, phone, link | VARCHAR | Formatted strings |
 | people, board_relation, dependency | VARIANT | JSON arrays |
 | location, tags | VARIANT | Complex objects |
-| mirror | VARIANT | Mirrored column data |
+| mirror | VARIANT | Mirrored column data with function (sum, avg, etc.) |
+| formula | VARCHAR | Evaluated formula result (custom evaluation engine) |
+
+**Note**: In addition to the board's custom columns, the integration automatically includes the following system columns in every Snowflake table:
+- `id` (NUMBER) - Monday.com item ID
+- `name` (VARCHAR) - Item name
+- `group_id` (VARCHAR) - ID of the group containing the item
+- `group_title` (VARCHAR) - Display name of the group containing the item
+
+#### Formula Column Handling
+
+The integration includes a **custom formula evaluation engine** that provides enhanced support beyond Monday.com's native API capabilities:
+
+**Why Custom Evaluation?**
+- Monday's API has historically not returned calculated formula values via `column_values`
+- As of API version 2025-01, Monday added `display_value` support, but with limitations:
+  - Rate limited to 10,000 formula values per minute
+  - Maximum of 5 formula columns per request
+  - **Does not support formulas with mirror columns**
+
+**Custom Engine Features:**
+- Evaluates formulas client-side when `display_value` is unavailable or null
+- Full support for formulas that reference mirror columns
+- Implements 40+ Monday formula functions including:
+  - **Mathematical**: SUM, AVERAGE, MIN, MAX, ROUND, ROUNDUP, ROUNDDOWN, MOD, POWER, SQRT, ABS
+  - **Logical**: IF, AND, OR, XOR, EXACT, SWITCH
+  - **Text**: CONCATENATE, SUBSTITUTE, REPLACE, SEARCH, LEFT, RIGHT, LEN, TRIM, UPPER, LOWER, REPT
+  - **Date/Time**: DATE, DAYS, WORKDAYS, WORKDAY, TODAY, YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, WEEKNUM
+  - **Conversion**: TEXT, VALUE, DATEVALUE, ISNUMBER
+- Automatically falls back to Monday's `display_value` when available
+- Handles edge cases like division by zero, null values, and type coercion
 
 ### Authentication
 
