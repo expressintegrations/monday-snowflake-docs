@@ -270,66 +270,6 @@ flowchart TB
     style Permanent fill:#ffccbc
 ```
 
-### Component Interaction Diagram
-
-```mermaid
-graph LR
-    subgraph Requests["User Requests"]
-        MW[Monday Webhook]
-        CS[Cloud Scheduler]
-        UC[User Config]
-        AR[Admin Request]
-    end
-
-    subgraph Endpoints["API Endpoints"]
-        TE[triggers.py]
-        AE[actions.py]
-        SE[settings.py]
-        ADE[admin.py]
-    end
-
-    subgraph Logic["Business Logic"]
-        RB[replicate_board]
-        UR[upsert_row]
-        UT[utils.py<br/>transform]
-        AU[auth.py<br/>get_tokens]
-    end
-
-    subgraph External["External APIs"]
-        MG[Monday GraphQL]
-        SF[Snowflake API]
-        FS[Firestore Database]
-        GCS[Cloud Storage]
-    end
-
-    subgraph DI["Dependency Injection"]
-        Containers[containers.py<br/>DI wiring]
-    end
-
-    MW <--> TE
-    CS <--> AE
-    UC <--> SE
-    AR <--> ADE
-
-    TE <--> RB
-    AE <--> UR
-    SE <--> UT
-    ADE <--> AU
-
-    RB <--> MG
-    UR <--> SF
-    UT <--> FS
-    AU <--> GCS
-
-    Containers -.provides.-> Logic
-
-    style Requests fill:#fff4e6
-    style Endpoints fill:#e8f4f8
-    style Logic fill:#e6f3ff
-    style External fill:#f3e5f5
-    style DI fill:#e0f2f1
-```
-
 ### Core Components
 
 #### 1. **API Layer**
